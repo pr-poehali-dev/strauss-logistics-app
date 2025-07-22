@@ -71,6 +71,7 @@ export default {
 			fontFamily: {
 				'roboto': ['Roboto', 'sans-serif'],
 				'montserrat': ['Montserrat', 'sans-serif'],
+				'dancing': ['Dancing Script', 'cursive'],
 			},
 			keyframes: {
 				'accordion-down': {

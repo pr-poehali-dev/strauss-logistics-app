@@ -63,8 +63,8 @@ const Index = () => {
   const StraussStar = ({ progress, className }: { progress: number; className?: string }) => (
     <div className={`relative ${className}`}>
       <svg
-        width="60"
-        height="60"
+        width="120"
+        height="120"
         viewBox="0 0 200 200"
         className={`transform transition-all duration-300 ${progress > 0 ? 'animate-glow-pulse' : ''}`}
         style={{ 
@@ -114,27 +114,27 @@ const Index = () => {
       
       {/* Progress ring */}
       <div className="absolute inset-0 rounded-full">
-        <svg width="60" height="60" className="transform -rotate-90">
+        <svg width="120" height="120" className="transform -rotate-90">
           <circle
-            cx="30"
-            cy="30"
-            r="28"
+            cx="60"
+            cy="60"
+            r="56"
             stroke="rgba(74, 144, 226, 0.2)"
-            strokeWidth="2"
+            strokeWidth="3"
             fill="none"
           />
           <circle
-            cx="30"
-            cy="30"
-            r="28"
+            cx="60"
+            cy="60"
+            r="56"
             stroke="#4A90E2"
-            strokeWidth="2"
+            strokeWidth="3"
             fill="none"
-            strokeDasharray={`${2 * Math.PI * 28}`}
-            strokeDashoffset={`${2 * Math.PI * 28 * (1 - progress / 100)}`}
+            strokeDasharray={`${2 * Math.PI * 56}`}
+            strokeDashoffset={`${2 * Math.PI * 56 * (1 - progress / 100)}`}
             className="transition-all duration-300 ease-out"
             style={{
-              filter: 'drop-shadow(0 0 4px rgba(74, 144, 226, 0.8))'
+              filter: 'drop-shadow(0 0 6px rgba(74, 144, 226, 0.8))'
             }}
           />
         </svg>
@@ -149,7 +149,8 @@ const Index = () => {
           <div className="flex flex-col items-center space-y-6">
             <StraussStar progress={loadingProgress} className="mb-4" />
             <div>
-              <h1 className="text-3xl font-montserrat font-bold mb-2">STRAUSS LOGISTICS</h1>
+              <h1 className="text-4xl font-dancing font-bold mb-2" style={{ color: '#DC143C' }}>Strauss</h1>
+              <h2 className="text-xl font-montserrat font-bold text-muted-foreground mb-1">LOGISTICS</h2>
               <p className="text-lg text-muted-foreground">Система оптимизации транспортных расходов</p>
             </div>
           </div>
@@ -183,15 +184,16 @@ const Index = () => {
               {/* Strauss Logo with Loading Animation */}
               <div className="relative">
                 {isLoading ? (
-                  <StraussStar progress={uploadProgress} className="w-10 h-10" />
+                  <StraussStar progress={uploadProgress} className="w-12 h-12" />
                 ) : (
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-blue-600 flex items-center justify-center">
-                    <span className="text-white font-bold text-sm">S</span>
-                  </div>
+                  <StraussStar progress={0} className="w-12 h-12" />
                 )}
               </div>
               <div>
-                <h1 className="text-xl font-montserrat font-bold">STRAUSS LOGISTICS</h1>
+                <div className="flex items-center space-x-2">
+                  <h1 className="text-xl font-dancing font-bold" style={{ color: '#DC143C' }}>Strauss</h1>
+                  <span className="text-lg font-montserrat font-bold text-foreground">LOGISTICS</span>
+                </div>
                 <p className="text-sm text-muted-foreground">Система оптимизации транспортных расходов</p>
               </div>
             </div>
