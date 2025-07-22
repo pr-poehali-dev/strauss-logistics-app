@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -11,6 +11,23 @@ const Index = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [activeTab, setActiveTab] = useState('dashboard');
+  const [initialLoading, setInitialLoading] = useState(true);
+  const [loadingProgress, setLoadingProgress] = useState(0);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setLoadingProgress(prev => {
+        if (prev >= 100) {
+          clearInterval(timer);
+          setTimeout(() => setInitialLoading(false), 500);
+          return 100;
+        }
+        return prev + 2;
+      });
+    }, 50);
+
+    return () => clearInterval(timer);
+  }, []);
 
   const handleUpload = (type: string) => {
     setIsLoading(true);
@@ -43,6 +60,119 @@ const Index = () => {
     </Card>
   );
 
+  const StraussStar = ({ progress, className }: { progress: number; className?: string }) => (
+    <div className={`relative ${className}`}>
+      <svg
+        width="60"
+        height="60"
+        viewBox="0 0 200 200"
+        className={`transform transition-all duration-300 ${progress > 0 ? 'animate-glow-pulse' : ''}`}
+        style={{ 
+          filter: progress > 50 ? 'drop-shadow(0 0 20px rgba(74, 144, 226, 0.6))' : 'none',
+          transform: `scale(${0.8 + (progress / 100) * 0.4}) rotate(${(progress / 100) * 360}deg)`
+        }}
+      >
+        {/* Strauss Star Petals */}
+        {[
+          { color: '#8FBC8F', rotation: 0 },    // Light green
+          { color: '#9ACD32', rotation: 36 },   // Yellow green
+          { color: '#FF8C00', rotation: 72 },   // Orange
+          { color: '#DC143C', rotation: 108 },  // Red
+          { color: '#B22222', rotation: 144 },  // Dark red
+          { color: '#4169E1', rotation: 180 },  // Royal blue
+          { color: '#1E90FF', rotation: 216 },  // Dodger blue
+          { color: '#87CEEB', rotation: 252 },  // Sky blue
+          { color: '#B0E0E6', rotation: 288 },  // Powder blue
+          { color: '#98FB98', rotation: 324 }   // Pale green
+        ].map((petal, index) => {
+          const petalProgress = Math.max(0, Math.min(100, (progress - index * 10) * 1.2));
+          return (
+            <path
+              key={index}
+              d="M100,100 Q120,60 140,100 Q120,140 100,100"
+              fill={petalProgress > 0 ? petal.color : 'transparent'}
+              stroke={petalProgress > 0 ? petal.color : '#333'}
+              strokeWidth="1"
+              opacity={petalProgress / 100}
+              transform={`rotate(${petal.rotation} 100 100)`}
+              style={{
+                transition: 'all 0.3s ease-out'
+              }}
+            />
+          );
+        })}
+        
+        {/* Center circle */}
+        <circle
+          cx="100"
+          cy="100"
+          r="8"
+          fill={progress > 80 ? '#4A90E2' : '#333'}
+          className="transition-all duration-300"
+        />
+      </svg>
+      
+      {/* Progress ring */}
+      <div className="absolute inset-0 rounded-full">
+        <svg width="60" height="60" className="transform -rotate-90">
+          <circle
+            cx="30"
+            cy="30"
+            r="28"
+            stroke="rgba(74, 144, 226, 0.2)"
+            strokeWidth="2"
+            fill="none"
+          />
+          <circle
+            cx="30"
+            cy="30"
+            r="28"
+            stroke="#4A90E2"
+            strokeWidth="2"
+            fill="none"
+            strokeDasharray={`${2 * Math.PI * 28}`}
+            strokeDashoffset={`${2 * Math.PI * 28 * (1 - progress / 100)}`}
+            className="transition-all duration-300 ease-out"
+            style={{
+              filter: 'drop-shadow(0 0 4px rgba(74, 144, 226, 0.8))'
+            }}
+          />
+        </svg>
+      </div>
+    </div>
+  );
+
+  if (initialLoading) {
+    return (
+      <div className="min-h-screen bg-background font-roboto dark flex items-center justify-center">
+        <div className="text-center space-y-8 animate-fade-in">
+          <div className="flex flex-col items-center space-y-6">
+            <StraussStar progress={loadingProgress} className="mb-4" />
+            <div>
+              <h1 className="text-3xl font-montserrat font-bold mb-2">STRAUSS LOGISTICS</h1>
+              <p className="text-lg text-muted-foreground">Система оптимизации транспортных расходов</p>
+            </div>
+          </div>
+          
+          <div className="w-64 mx-auto space-y-2">
+            <div className="h-1 bg-muted rounded-full overflow-hidden">
+              <div 
+                className="h-full bg-gradient-to-r from-primary to-blue-500 transition-all duration-300 ease-out"
+                style={{ width: `${loadingProgress}%` }}
+              />
+            </div>
+            <p className="text-sm text-muted-foreground">
+              {loadingProgress < 30 ? 'Инициализация системы...' :
+               loadingProgress < 60 ? 'Загрузка компонентов...' :
+               loadingProgress < 90 ? 'Подготовка интерфейса...' :
+               'Почти готово!'}
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-background font-roboto dark">
       {/* Header */}
@@ -52,13 +182,12 @@ const Index = () => {
             <div className="flex items-center space-x-3">
               {/* Strauss Logo with Loading Animation */}
               <div className="relative">
-                <div className={`w-10 h-10 rounded-full border-4 border-primary/20 ${isLoading ? 'animate-pulse-ring' : ''}`}>
-                  <div className={`w-full h-full rounded-full bg-gradient-to-br from-primary to-blue-600 flex items-center justify-center ${isLoading ? 'animate-spin-slow' : ''}`}>
+                {isLoading ? (
+                  <StraussStar progress={uploadProgress} className="w-10 h-10" />
+                ) : (
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-blue-600 flex items-center justify-center">
                     <span className="text-white font-bold text-sm">S</span>
                   </div>
-                </div>
-                {isLoading && (
-                  <div className="absolute inset-0 rounded-full border-4 border-primary/30 animate-pulse-ring"></div>
                 )}
               </div>
               <div>
